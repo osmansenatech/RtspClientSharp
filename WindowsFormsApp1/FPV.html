@@ -1,0 +1,25 @@
+﻿<html>
+<style>
+    #video {
+        width: 640px;
+        height: 480px;
+        position: absolute;
+        left: 15px;
+        top: 100px;
+        background-color: black;
+        cursor: pointer;
+    }
+</style>
+<body>
+    <div id="output"></div>
+    <img id="video" style="-webkit-user-select: none;" src="http://localhost:80" onerror="if (window.csharp) csharp.fpvVideoFailed(this.src);" onclick="csharp?.restartVideo();document.location.reload();">
+    <script>
+        function loaded() {
+        }
+
+        if (window.CefSharp)
+            CefSharp.BindObjectAsync().then(() => loaded());
+    </script>
+
+</body>
+</html >

@@ -1,0 +1,9 @@
+﻿namespace FPV.RawFramesDecoding
+{
+    public enum FramePixelFormat
+    {
+        Grayscale,
+        Bgr24,
+        Bgra32,
+    }
+}
