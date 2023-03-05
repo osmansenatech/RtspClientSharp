@@ -22,25 +22,27 @@ namespace FPV
     {
         public class BrowserConnection
         {
-            public int width { get; set; }
-            public int height { get; set; }
+            private FPVManager _manager = new FPVManager();
             public byte[] bitmapData { get; set; }
             public void FpvVideoFailed(string src)
             {
                 Console.WriteLine(src);
             }
-            public void StartVideo()
+            public void StartVideo(int width, int height)
             {
-
+                _manager.StartFPVStream("fpv.avi", "rtsp://admin:admin@192.168.3.12:554/1",null,null,width,height);
             }
             public void RestartVideo()
             {
+            }
+            public void StopVideo()
+            {
+                _manager.StopFPVStream();
             }
         }
 
         private readonly ChromiumWebBrowser browser;
         private readonly BrowserConnection browserConnection;
-        private readonly RTSPManager rtspMAnager;
         public Form1()
         {
             InitializeComponent();
@@ -68,12 +70,6 @@ namespace FPV
             Controls.Add(browser);
 
             browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
-
-            rtspMAnager = new RTSPManager();
-            rtspMAnager.VideoSource.FrameReceived += VideoSource_FrameReceived;
-            rtspMAnager.Start("rtsp://192.168.3.12:554/1", "admin", "admin");
-            server = new ImageStreamingServer(Snapshots());
-            server.Start(80);
         }
 
         private void Browser_IsBrowserInitializedChanged(object sender, EventArgs e)
@@ -81,57 +77,6 @@ namespace FPV
             //browser.ShowDevTools();
         }
 
-        ImageStreamingServer server;
-
-        private IEnumerable<Image> Snapshots()
-        {
-            while (true)
-            {
-                if (_writeableBitmap != null)
-                    lock (_writeableBitmap)
-                    {
-                        yield return _writeableBitmap;
-                    }
-                System.Threading.Thread.Sleep(50);
-            }
-            yield break;
-        }
-
-        private void VideoSource_FrameReceived(object sender, IDecodedVideoFrame frame)
-        {
-            if (_transformParameters==null)
-            {
-                ReinitializeBitmap(frame.FrameParameters.Width,frame.FrameParameters.Height,frame.FrameParameters.PixelFormat);
-            }
-            //Console.WriteLine($"{frame.FrameParameters.Width}x{frame.FrameParameters.Height} {frame.FrameParameters.PixelFormat}");
-
-            lock (_writeableBitmap)
-            {
-                System.Drawing.Imaging.BitmapData bd = _writeableBitmap.LockBits(new Rectangle(0, 0, _writeableBitmap.Width, _writeableBitmap.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-                try
-                {
-                    IntPtr pval = bd.Scan0;
-                    frame.TransformTo(pval, bd.Stride, _transformParameters);
-                }
-                finally
-                {
-                    _writeableBitmap.UnlockBits(bd);
-                }
-            }
-        }
-
-        TransformParameters _transformParameters;
-        Bitmap _writeableBitmap;
-        private void ReinitializeBitmap(int width, int height, FFmpegPixelFormat pixelFormat)
-        {
-            _transformParameters = new TransformParameters(RectangleF.Empty,
-                    new System.Drawing.Size(width, height),
-                    ScalingPolicy.Stretch, PixelFormat.Bgra32, ScalingQuality.FastBilinear);
-
-            browserConnection.width = width;
-            browserConnection.height = height;
-            _writeableBitmap = new Bitmap(width, height+1, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-        }
 
         void ExecuteScript(string script)
         {
@@ -140,5 +85,9 @@ namespace FPV
                 CefSharp.WebBrowserExtensions.ExecuteScriptAsync(browser, script);
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            browserConnection.StopVideo();
+        }
     }
 }

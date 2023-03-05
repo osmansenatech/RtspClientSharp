@@ -14,7 +14,10 @@
     <div id="output"></div>
     <img id="video" style="-webkit-user-select: none;" src="http://localhost:80" onerror="if (window.csharp) csharp.fpvVideoFailed(this.src);" onclick="csharp?.restartVideo();document.location.reload();">
     <script>
+        var video = document.getElementById('video');
+
         function loaded() {
+            csharp.startVideo(video.width, video.height);
         }
 
         if (window.CefSharp)
