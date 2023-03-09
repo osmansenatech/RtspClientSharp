@@ -70,8 +70,10 @@ namespace FPV
                 }
                 var timeEllapsed = (DateTime.Now - time).TotalMilliseconds;
                 sleepMS -= (int)timeEllapsed;
-
-                System.Threading.Thread.Sleep(sleepMS);
+                if (sleepMS > 0)
+                {
+                    System.Threading.Thread.Sleep(sleepMS);
+                }
             }
             yield break;
         }

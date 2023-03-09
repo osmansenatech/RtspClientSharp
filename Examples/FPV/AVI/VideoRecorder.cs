@@ -45,7 +45,7 @@ namespace FPV.AVI
                 lock (encoder)
                 {
                     isEncoding = true;
-                    encoder.Encode(bmp, (float)DateTime.Now.Subtract(startTime).TotalSeconds);
+                    encoder.Encode(bmp);//, (float)DateTime.Now.Subtract(startTime).TotalSeconds);
                 }
         }
 

@@ -59,10 +59,10 @@ namespace FPV
             {
                 Dock = DockStyle.Fill
             };
-            browser.BrowserSettings.FileAccessFromFileUrls = CefSharp.CefState.Enabled;
-            browser.BrowserSettings.UniversalAccessFromFileUrls = CefSharp.CefState.Enabled;
+            //browser.BrowserSettings.FileAccessFromFileUrls = CefSharp.CefState.Enabled;
+            //browser.BrowserSettings.UniversalAccessFromFileUrls = CefSharp.CefState.Enabled;
             browser.BrowserSettings.LocalStorage = CefSharp.CefState.Disabled;
-            browser.BrowserSettings.ApplicationCache = CefSharp.CefState.Disabled;
+            //browser.BrowserSettings.ApplicationCache = CefSharp.CefState.Disabled;
 
             browserConnection = new BrowserConnection();
             browser.JavascriptObjectRepository.Register("csharp", browserConnection, false);

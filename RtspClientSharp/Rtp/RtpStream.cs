@@ -20,6 +20,7 @@ namespace RtspClientSharp.Rtp
         public int PacketsLostSinceLastReset { get; private set; }
         public uint CumulativePacketLost { get; private set; }
         public ushort SequenceCycles { get; private set; }
+        public Action<RtpPacket> RtpPacketReceived;
 
         public RtpStream(IMediaPayloadParser mediaPayloadParser, int samplesFrequency,
             IRtpSequenceAssembler rtpSequenceAssembler = null)
@@ -38,7 +39,7 @@ namespace RtspClientSharp.Rtp
         {
             if (!RtpPacket.TryParse(payloadSegment, out RtpPacket rtpPacket))
                 return;
-
+            RtpPacketReceived?.Invoke(rtpPacket);
             if (_rtpSequenceAssembler != null)
                 _rtpSequenceAssembler.ProcessPacket(ref rtpPacket);
             else

@@ -47,6 +47,7 @@ namespace RtspClientSharp.Rtsp
         private bool _isServerSupportsGetParameterRequest;
         private int _disposed;
 
+        public Action<RtpPacket> RtpPacketReceived;
         public Action<RawFrame> FrameReceived;
 
         public RtspClientInternal(ConnectionParameters connectionParameters,
@@ -296,6 +297,7 @@ namespace RtspClientSharp.Rtsp
             }
 
             var rtpStream = new RtpStream(mediaPayloadParser, track.SamplesFrequency, rtpSequenceAssembler);
+            rtpStream.RtpPacketReceived += packet => RtpPacketReceived?.Invoke(packet);
             _streamsMap.Add(rtpChannelNumber, rtpStream);
 
             var rtcpStream = new RtcpStream();

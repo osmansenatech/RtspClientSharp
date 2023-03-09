@@ -18,6 +18,7 @@ namespace RtspClientSharp
 
         public ConnectionParameters ConnectionParameters { get; }
 
+        public event EventHandler<Rtp.RtpPacket> RtpPacketReceived;
         public event EventHandler<RawFrame> FrameReceived;
 
         public RtspClient(ConnectionParameters connectionParameters)
@@ -213,6 +214,10 @@ namespace RtspClientSharp
         {
             return new RtspClientInternal(connectionParameters, transportClientProvider)
             {
+                RtpPacketReceived = packet =>
+                {
+                    RtpPacketReceived?.Invoke(this, packet);
+                },
                 FrameReceived = frame =>
                 {
                     Volatile.Write(ref _anyFrameReceived, true);
